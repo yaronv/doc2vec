@@ -1,24 +1,16 @@
-import numpy
-
-import gensim
-import pandas as pd
-from gensim.models.doc2vec import Doc2Vec
-import os
-import collections
-import smart_open
-import random
 import glob
-import xml.etree.ElementTree as ET
-import multiprocessing
-import numpy as np
 # from sklearn.manifold import TSNE
 import matplotlib.pyplot as plt
-from matplotlib import cm
-from mpl_toolkits.mplot3d import Axes3D
-from bhtsne import tsne
+import multiprocessing
+import os
+import xml.etree.ElementTree as ET
 from sklearn.decomposition import PCA as sklearnPCA
-from sklearn import preprocessing
+
+import gensim
+from gensim.models.doc2vec import Doc2Vec
 from nltk.corpus import stopwords
+
+from src.config import *
 
 
 class Doc2VecTR(object):
@@ -53,8 +45,8 @@ class Doc2VecTR(object):
             # model.min_alpha = model.alpha  # fix the learning rate, no decay
 
 
-        model.save('/home/yaron/doc2vec/model/trained.model')
-        model.save_word2vec_format('/home/yaron/doc2vec/model/trained.word2vec')
+        model.save(model_path)
+        model.save_word2vec_format(word2vec_path)
 
         print 'total docs learned %s' % (len(model.docvecs))
 
