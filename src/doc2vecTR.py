@@ -27,31 +27,38 @@ class Doc2VecTR(object):
         # static = os.path.join(root, 'static')
 
 
-        corpusData = list(self.readCorpus(self.train_corpus, -1))
-
         cores = multiprocessing.cpu_count()
         print 'num of cores is %s' % (cores)
 
-        model = Doc2Vec(size=400, window=10, min_count=3, sample=1e-4, negative=5, workers=cores, dm=1)
 
-        model.build_vocab(corpusData)
 
-        # start training
-        for epoch in range(20):
-            if epoch % 20 == 0:
+        if(loadExisting):
+            print 'loading an exiting model'
+            model = Doc2Vec.load(model_path)
+            # word_model = gensim.models.KeyedVectors.load_word2vec_format(word2vec_path)
+        else:
+            print 'training a new model'
+            corpusData = list(self.readCorpus(self.train_corpus, -1))
+
+            model = Doc2Vec(size=400, window=10, min_count=3, sample=1e-4, negative=5, workers=cores, dm=1)
+
+            model.build_vocab(corpusData)
+
+            # start training
+            for epoch in range(epoches):
+
                 print ('Now training epoch %s'%epoch)
-            model.train(corpusData, total_examples=model.corpus_count, epochs=model.iter)
-            # model.alpha -= 0.002  # decrease the learning rate
-            # model.min_alpha = model.alpha  # fix the learning rate, no decay
+                model.train(corpusData, total_examples=model.corpus_count, epochs=model.iter)
+                # model.alpha -= 0.002  # decrease the learning rate
+                # model.min_alpha = model.alpha  # fix the learning rate, no decay
 
 
-        model.save(model_path)
-        model.save_word2vec_format(word2vec_path)
+            model.save(model_path)
+            model.save_word2vec_format(word2vec_path)
 
         print 'total docs learned %s' % (len(model.docvecs))
 
         print 'starting to draw'
-
 
         # gather all groups vectors and reduce the dimension
         groupsVectors = []
@@ -91,10 +98,12 @@ class Doc2VecTR(object):
         # surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
         #                        linewidth=0, antialiased=False)
         #
-        plt.plot(
-            vectors[:,0][:groupsSizes[0]], vectors[:,1][:groupsSizes[0]], 'ro',
-            vectors[:,0][groupsSizes[0]:groupsSizes[1]], vectors[:,1][groupsSizes[0]:groupsSizes[1]], 'bo')
-            # vectors[:,0][groupsSizes[1]:groupsSizes[2]], vectors[:,1][groupsSizes[1]:groupsSizes[2]], 'go'
+
+        for idx, group in enumerate(groups):
+            fromIndex = 0
+            if idx > 0:
+                fromIndex = groupsSizes[idx-1]
+            plt.plot(vectors[:,0][fromIndex:groupsSizes[idx]], vectors[:,1][fromIndex:groupsSizes[idx]], colors[idx], markersize=marker_size, label=labels[idx])
         plt.show()
 
     def readCorpus(self, corpus, startIndex):

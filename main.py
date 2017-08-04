@@ -3,5 +3,5 @@ from src.config import *
 
 if __name__ == '__main__':
 
-    doc2vec = Doc2VecTR(unlabeled, [dis_positives, xpand_positives])
+    doc2vec = Doc2VecTR(unlabeled, groups)
     doc2vec.run()
