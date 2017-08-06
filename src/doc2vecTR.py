@@ -4,9 +4,12 @@ import matplotlib.pyplot as plt
 import multiprocessing
 import os
 import xml.etree.ElementTree as ET
+from matplotlib import cm
+from mpl_toolkits.mplot3d import Axes3D
 from sklearn.decomposition import PCA as sklearnPCA
 
 import gensim
+import numpy as np
 from gensim.models.doc2vec import Doc2Vec
 from nltk.corpus import stopwords
 
@@ -82,28 +85,24 @@ class Doc2VecTR(object):
 
         # X_scaled = preprocessing.scale(groupsVectors)
 
-        pca = sklearnPCA(n_components=2)
+        pca = sklearnPCA(n_components=3)
         vectors = pca.fit_transform(groupsVectors)
 
 
 
-        # fig = plt.figure()
-        # ax = fig.gca(projection='3d')
-        #
-        # # Make data.
-        # X = vectors[:,0]
-        # Y = vectors[:,1]
-        # X, Y = np.meshgrid(X, Y)
-        # Z = vectors[:,2]
-        # surf = ax.plot_surface(X, Y, Z, cmap=cm.coolwarm,
-        #                        linewidth=0, antialiased=False)
-        #
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
 
         for idx, group in enumerate(groups):
+
             fromIndex = 0
             if idx > 0:
                 fromIndex = groupsSizes[idx-1]
-            plt.plot(vectors[:,0][fromIndex:groupsSizes[idx]], vectors[:,1][fromIndex:groupsSizes[idx]], colors[idx], markersize=marker_size, label=labels[idx])
+
+            ax.scatter(vectors[:, 0][fromIndex:groupsSizes[idx]], vectors[:, 1][fromIndex:groupsSizes[idx]], vectors[:, 2][fromIndex:groupsSizes[idx]],
+                         c=colors[idx], marker=markers[idx])
+
+            # plt.plot(vectors[:,0][fromIndex:groupsSizes[idx]], vectors[:,1][fromIndex:groupsSizes[idx]], colors[idx], markersize=marker_size, label=labels[idx])
         plt.show()
 
     def readCorpus(self, corpus, startIndex):
