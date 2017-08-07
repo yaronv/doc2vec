@@ -91,7 +91,7 @@ class Doc2VecTR(object):
 
 
         fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
+        # ax = fig.add_subplot(111, projection='3d')
 
         for idx, group in enumerate(groups):
 
@@ -99,10 +99,10 @@ class Doc2VecTR(object):
             if idx > 0:
                 fromIndex = groupsSizes[idx-1]
 
-            ax.scatter(vectors[:, 0][fromIndex:groupsSizes[idx]], vectors[:, 1][fromIndex:groupsSizes[idx]], vectors[:, 2][fromIndex:groupsSizes[idx]],
-                         c=colors[idx], marker=markers[idx])
+            # ax.scatter(vectors[:, 0][fromIndex:groupsSizes[idx]], vectors[:, 1][fromIndex:groupsSizes[idx]], vectors[:, 2][fromIndex:groupsSizes[idx]],
+            #              c=colors[idx], marker=markers[idx])
 
-            # plt.plot(vectors[:,0][fromIndex:groupsSizes[idx]], vectors[:,1][fromIndex:groupsSizes[idx]], colors[idx], markersize=marker_size, label=labels[idx])
+            plt.plot(vectors[:,0][fromIndex:groupsSizes[idx]], vectors[:,1][fromIndex:groupsSizes[idx]], colors[idx], markersize=marker_size)
         plt.show()
 
     def readCorpus(self, corpus, startIndex):

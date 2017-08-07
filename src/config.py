@@ -6,11 +6,17 @@ dis_negatives = '/home/yaron/doc2vec/dis-negs2'
 dis_positives = '/home/yaron/doc2vec/dis-positives'
 dis_ignores = '/home/yaron/doc2vec/dis-ignores'
 xpand_positives = '/home/yaron/doc2vec/xpand-positives'
+xpand_ignores = '/home/yaron/doc2vec/xpand-ignores'
+xpand_negs = '/home/yaron/doc2vec/xpand-negs'
 
-groups = [dis_negatives, dis_positives, dis_ignores]
-colors = ['r', 'b', 'g']
-markers = ['o', 'o', 'o']
-labels = ['positives', 'ignores']
+awlq_positives= '/home/yaron/doc2vec/awlq-positives'
+awlq_ignores = '/home/yaron/doc2vec/awlq-ignores'
+awlq_negs = '/home/yaron/doc2vec/awlq-negs'
+
+
+groups = [awlq_positives, awlq_negs, awlq_ignores]
+colors = ['bo', 'ro', 'go']
+markers = ['o', '^', 'o']
 marker_size = 5
 
 model_path = '/home/yaron/doc2vec/model/trained.model'
