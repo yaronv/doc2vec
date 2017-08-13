@@ -14,6 +14,8 @@ from gensim.models.doc2vec import Doc2Vec
 from nltk.corpus import stopwords
 
 from src.config import *
+from src.tf_visualizer import tf_visualizer
+import ntpath
 
 
 class Doc2VecTR(object):
@@ -61,10 +63,11 @@ class Doc2VecTR(object):
 
         print 'total docs learned %s' % (len(model.docvecs))
 
-        print 'starting to draw'
+        # print 'starting to draw'
 
         # gather all groups vectors and reduce the dimension
         groupsVectors = []
+        ids = []
         groupsSizes = []
         sizeSoFar = -1
         # add the groups vectors
@@ -76,34 +79,52 @@ class Doc2VecTR(object):
             for vec in groupData:
                 vecData = model.infer_vector(vec.words)
                 groupsVectors.append(vecData)
+                ids.append(vec.tags)
 
 
         # add the corpus vectors
-        for vec in model.docvecs:
-            groupsVectors.append(vec)
+        # for vec in model.docvecs:
+        #     groupsVectors.append(vec)
 
+        print 'writing vectors to file'
+        for idx, file in enumerate(metaFiles):
+            fromIndex = 0
+            if idx > 0:
+                fromIndex = groupsSizes[idx - 1]
+            with open(os.path.join(outputPath, file + '-vecs.tsv'), 'wb') as file_metadata:
+                for i, vec in enumerate(groupsVectors[fromIndex:groupsSizes[idx]]):
+                    file_metadata.write(",".join(["%.15f" % number for number in vec]) + '\n')
+
+            with open(os.path.join(outputPath, file + '.tsv'), 'wb') as file_metadata:
+                for i, id in enumerate(ids[fromIndex:groupsSizes[idx]]):
+                    file_metadata.write(id + '\n')
+
+        visualizer = tf_visualizer(groupsSizes, 400)
+
+        visualizer.visualize()
 
         # X_scaled = preprocessing.scale(groupsVectors)
 
-        pca = sklearnPCA(n_components=3)
-        vectors = pca.fit_transform(groupsVectors)
+        # pca = sklearnPCA(n_components=2)
+        # vectors = pca.fit_transform(groupsVectors)
 
 
+        #
+        # fig = plt.figure()
+        #
+        # for idx, group in enumerate(groups):
+        #
+        #     fromIndex = 0
+        #     if idx > 0:
+        #         fromIndex = groupsSizes[idx-1]
+        #
+        #     # ax.scatter(vectors[:, 0][fromIndex:groupsSizes[idx]], vectors[:, 1][fromIndex:groupsSizes[idx]], vectors[:, 2][fromIndex:groupsSizes[idx]],
+        #     #              c=colors[idx], marker=markers[idx])
+        #
+        #     plt.plot(vectors[:,0][fromIndex:groupsSizes[idx]], vectors[:,1][fromIndex:groupsSizes[idx]], colors[idx], markersize=marker_size)
+        # plt.show()
 
-        fig = plt.figure()
-        # ax = fig.add_subplot(111, projection='3d')
 
-        for idx, group in enumerate(groups):
-
-            fromIndex = 0
-            if idx > 0:
-                fromIndex = groupsSizes[idx-1]
-
-            # ax.scatter(vectors[:, 0][fromIndex:groupsSizes[idx]], vectors[:, 1][fromIndex:groupsSizes[idx]], vectors[:, 2][fromIndex:groupsSizes[idx]],
-            #              c=colors[idx], marker=markers[idx])
-
-            plt.plot(vectors[:,0][fromIndex:groupsSizes[idx]], vectors[:,1][fromIndex:groupsSizes[idx]], colors[idx], markersize=marker_size)
-        plt.show()
 
     def readCorpus(self, corpus, startIndex):
         print 'reading corpus %s' % (corpus)
@@ -129,4 +150,4 @@ class Doc2VecTR(object):
             if( i % 100 == 0):
                 print 'processing document %s' % (i)
 
-            yield gensim.models.doc2vec.TaggedDocument(gensim.utils.lemmatize(text, stopwords=stopwords.words('english')), [i])
+            yield gensim.models.doc2vec.TaggedDocument(gensim.utils.lemmatize(text, stopwords=stopwords.words('english')), ntpath.basename(filename))
