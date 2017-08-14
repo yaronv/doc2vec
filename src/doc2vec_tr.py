@@ -79,20 +79,20 @@ class Doc2VecTR(object):
         visualizer.visualize()
 
     @staticmethod
-    def get_group_name(index, groupsSizes):
+    def get_group_name(index, groups_sizes):
         result = 0
         found = False
-        for i, gSize in enumerate(groupsSizes):
-            if (index < gSize and found == False):
+        for i, g_size in enumerate(groups_sizes):
+            if index < g_size and found == False:
                 found = True
                 result = i
         return groupsNames[result]
 
     @staticmethod
-    def read_corpus(corpus, startIndex):
-        print 'reading corpus %s' % (corpus)
+    def read_corpus(corpus, start_index):
+        print 'reading corpus %s' % corpus
 
-        i = startIndex
+        i = start_index
 
         for filename in glob.glob(os.path.join(corpus, '*.xml')):
 

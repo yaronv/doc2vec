@@ -1,4 +1,4 @@
-from src.doc2vecTR import Doc2VecTR
+from src.doc2vec_tr import Doc2VecTR
 from src.config import *
 
 if __name__ == '__main__':
