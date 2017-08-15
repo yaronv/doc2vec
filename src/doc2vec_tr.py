@@ -34,7 +34,7 @@ class Doc2VecTR(object):
             model.build_vocab(corpus_data)
 
             # start training
-            for epoch in range(epoches):
+            for epoch in range(epochs):
                 print ('Now training epoch %s' % epoch)
                 model.train(corpus_data, total_examples=model.corpus_count, epochs=model.iter)
                 # model.alpha -= 0.002  # decrease the learning rate
