@@ -12,7 +12,6 @@ class TF_visualizer(object):
         self.dimension = dimension
 
     def visualize(self):
-        # model = Word2Vec.load(model_path)
 
         # adding into projector
         config = projector.ProjectorConfig()

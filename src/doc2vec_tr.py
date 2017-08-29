@@ -21,13 +21,12 @@ class Doc2VecTR(object):
         cores = multiprocessing.cpu_count()
         print 'num of cores is %s' % (cores)
 
-        if loadExisting:
+        if load_existing:
             print 'loading an exiting model'
             model = Doc2Vec.load(model_path)
-            # word_model = gensim.models.KeyedVectors.load_word2vec_format(word2vec_path)
         else:
             print 'training a new model'
-            corpus_data = list(self.read_corpus(self.train_corpus, -1))
+            corpus_data = list(read_corpus(self.train_corpus, -1))
 
             model = Doc2Vec(size=model_dimensions, window=10, min_count=3, sample=1e-4, negative=5, workers=cores, dm=1)
 
@@ -47,12 +46,13 @@ class Doc2VecTR(object):
 
         groups_vectors = []
         ids = []
+        labels = []
         groups_sizes = []
         size_so_far = -1
 
         # add the groups vectors
-        for group in self.groups:
-            group_data = list(self.read_corpus(group, size_so_far))
+        for i, group in enumerate(self.groups):
+            group_data = list(read_corpus(group, size_so_far))
             size_so_far += len(group_data)
             groups_sizes.append(size_so_far)
 
@@ -60,17 +60,23 @@ class Doc2VecTR(object):
                 vec_data = model.infer_vector(vec.words)
                 groups_vectors.append(vec_data)
                 ids.append(vec.tags)
+                labels.append(i)
 
         print 'writing meta data to file in tensorflow format'
         with open(os.path.join(output_path, meta_file + '.tsv'), 'wb') as file_metadata:
             file_metadata.write('doc_id\tgroup' + '\n')
-            for idx, id in enumerate(ids):
-                file_metadata.write(id + '\t' + self.get_group_name(idx, groups_sizes) + '\n')
+            for i, id in enumerate(ids):
+                file_metadata.write(id + '\t' + self.get_group_name(i, groups_sizes) + '\n')
 
         print 'writing vectors to file'
         with open(os.path.join(output_path, meta_file + '-vecs.tsv'), 'wb') as file_metadata:
             for i, vec in enumerate(groups_vectors):
                 file_metadata.write(",".join(["%.15f" % number for number in vec]) + '\n')
+
+        # print 'writing CNN train data to file'
+        # with open(os.path.join(output_path, meta_file + '-train.csv'), 'wb') as file_metadata:
+        #     for i, vec in enumerate(groups_vectors):
+        #         file_metadata.write(",".join(["%.20f" % number for number in vec]) + ',' + str(labels[i]) + '\n')
 
         # create a new tensor board visualizer
         visualizer = TF_visualizer(groups_sizes, model_dimensions)
@@ -88,14 +94,13 @@ class Doc2VecTR(object):
                 result = i
         return groupsNames[result]
 
-    @staticmethod
-    def read_corpus(corpus, start_index):
-        print 'reading corpus %s' % corpus
+def read_corpus(corpus, start_index):
+    print 'reading corpus %s' % corpus
 
-        i = start_index
+    i = start_index
 
-        for filename in glob.glob(os.path.join(corpus, '*.xml')):
-
+    for filename in glob.glob(os.path.join(corpus, '*.xml')):
+        try:
             tree = ET.parse(filename)
             root = tree.getroot()
 
@@ -114,3 +119,11 @@ class Doc2VecTR(object):
 
             yield gensim.models.doc2vec.TaggedDocument(
                 gensim.utils.lemmatize(text, stopwords=stopwords.words('english')), ntpath.basename(filename))
+        except:
+            print 'error parsing file: %s, using naive parsing' % filename
+            with open(filename, 'r') as file_content:
+                content = file_content.read()
+                text = content.replace("<document>", '').replace("</document>", '').replace("<Title>", '').replace("</Title>", '').replace("<Body>", '').replace("</Body>", '')
+
+                yield gensim.models.doc2vec.TaggedDocument(
+                    gensim.utils.lemmatize(text, stopwords=stopwords.words('english')), ntpath.basename(filename))
