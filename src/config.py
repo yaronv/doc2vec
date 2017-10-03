@@ -1,5 +1,6 @@
 # unlabeled documents
 unlabeled = '/home/yaron/doc2vec/train-200k'
+unlabeled_2m = '/home/yaron/doc2vec/2m-data'
 
 # groups of news documents
 dis_negatives = '/home/yaron/doc2vec/docs-topics/dis-negs2'
@@ -9,9 +10,9 @@ xpand_positives = '/home/yaron/doc2vec/docs-topics/xpand-positives'
 xpand_ignores = '/home/yaron/doc2vec/docs-topics/xpand-ignores'
 xpand_negs = '/home/yaron/doc2vec/docs-topics/xpand-negs'
 xpand_all = '/home/yaron/doc2vec/docs-topics/xpand-all'
-awlq_positives= '/home/yaron/doc2vec/docs-topics/awlq-positives'
+awlq_positives= '/home/yaron/temp/awlq-pos/xml'
 awlq_ignores = '/home/yaron/doc2vec/docs-topics/awlq-ignores'
-awlq_negs = '/home/yaron/doc2vec/docs-topics/awlq-negs'
+awlq_negs = '/home/yaron/temp/awlq-negs/xml'
 mrg_positives= '/home/yaron/doc2vec/docs-topics/mrg-pos'
 dvst_positives= '/home/yaron/doc2vec/docs-topics/dvst-pos'
 brib_pos = '/home/yaron/doc2vec/docs-topics/brib-pos'
@@ -40,8 +41,8 @@ meta_file = 'metadata'
 # groupsNames = ['dis_positives', 'xpand_positives', 'awlq_positives', 'mrg_positives', 'dvst_positives', 'brib_positives', 'class_positives', 'fake1_positives']
 # groups = [dis_positives, xpand_positives, awlq_positives, mrg_positives, dvst_positives, brib_pos, class_pos, fake1_pos]
 
-groupsNames = ['xpand_positives', 'dis_positives', 'awlq_positives', 'mrg_positives', 'dvst_positives', 'brib_positives', "class_positives", 'fake1_positives']
-groups = [xpand_positives, dis_positives, awlq_positives, mrg_positives, dvst_positives, brib_pos, class_pos, fake1_pos]
+groupsNames = ['awlq_positives', 'awlq_negatives']
+groups = [awlq_positives, awlq_negs]
 
 # research reports documents conf
 # groupsNames = ['dvst_rr_docs_pos', 'dvst_rr_docs_neg']
@@ -51,15 +52,15 @@ groups = [xpand_positives, dis_positives, awlq_positives, mrg_positives, dvst_po
 # groupsNames = ['acci_pos', 'dvst_pos', 'layofs_pos', 'mrg_pos']
 # groups = [acci_sents_pos, dvst_sents_pos, layofs_sents_pos, mrg_sents_pos]
 
-model_path = '/home/yaron/doc2vec/model/trained.model'
-word2vec_path = '/home/yaron/doc2vec/model/trained.word2vec'
+model_path = '/home/yaron/doc2vec/model-2m/trained.model'
+word2vec_path = '/home/yaron/doc2vec/model-2m/trained.word2vec'
 
-word2vec_model = '/home/yaron/doc2vec/model/word2vec.model'
-word2vec_vocab = '/home/yaron/doc2vec/model/word2vec.vocab'
+word2vec_model = '/home/yaron/doc2vec/model-2m/word2vec.model'
+word2vec_vocab = '/home/yaron/doc2vec/model-2m/word2vec.vocab'
 
 model_dimensions = 400
 
-load_existing = True
-epochs = 50
+load_existing = False
+epochs = 10
 
 tokens_separator = "#$#"

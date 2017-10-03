@@ -46,20 +46,20 @@ if __name__ == '__main__':
     print("\nParameters:")
     for attr, value in sorted(FLAGS.__flags.items()):
         print("{}={}".format(attr.upper(), value))
-    print ''
+    print('')
 
     # Data Preparation
     # ==================================================
     # Load the doc2vec and word2vec models
-    print 'Loading words model...'
+    print('Loading words model...')
     # model = Doc2Vec.load(model_path)
     word_model = gensim.models.KeyedVectors.load_word2vec_format(word2vec_path)
-    print ''
+    print('')
 
     # Load data
-    print 'Loading data...'
+    print('Loading data...')
     x_text, y = data_helper.load_data_and_labels(FLAGS.positive_data_folder, FLAGS.negative_data_folder)
-    print ''
+    print('')
 
     # Build vocabulary
     # sorted_model_vocab = sorted(word_model.vocab.items(), key=lambda item:item[1].index)
@@ -94,7 +94,7 @@ if __name__ == '__main__':
             else:
                 not_found += 1
                 # print 'embedding not found for word: %s' %word
-    print 'Total words not found in embeddings: {:d}'.format(not_found)
+    print('Total words not found in embeddings: {:d}'.format(not_found))
 
     # projecting the embeddings
     config = projector.ProjectorConfig()
