@@ -1,8 +1,9 @@
-import sys, os
-from gensim.models import Word2Vec
-import tensorflow as tf
+import os
+
 import numpy as np
+import tensorflow as tf
 from tensorflow.contrib.tensorboard.plugins import projector
+
 from src.config import *
 
 
@@ -16,13 +17,14 @@ class TF_visualizer(object):
         # adding into projector
         config = projector.ProjectorConfig()
 
-        g_size = self.groups_sizes[len(self.groups_sizes) - 1] + 1
+        g_size = list(self.groups_sizes.values())[-1]
 
         placeholder = np.zeros((g_size, self.dimension))
 
         with open(os.path.join(output_path, meta_file + '-vecs.tsv'), 'r') as file_metadata:
             for i, line in enumerate(file_metadata):
-                placeholder[i] = np.fromstring(line, sep=',')
+                if(line != ''):
+                    placeholder[i] = np.fromstring(line, sep=',')
 
         tensor_name = meta_file
         embedding_var = tf.Variable(placeholder, trainable=False, name=tensor_name)

@@ -2,14 +2,14 @@ import itertools
 import ntpath
 import os
 import xml.etree.ElementTree as ET
-from random import shuffle
 
 import gensim
 from nltk.corpus import stopwords
 
 
-class DocumentsIterable(object):
+class CorpusReader(object):
     def __init__(self, dirnames):
+        self.docs = []
         self.dirnames = dirnames
         self.files = [os.listdir(dirname) for dirname in dirnames]
 
@@ -19,10 +19,9 @@ class DocumentsIterable(object):
 
         self.files = list(itertools.chain(*self.files))
 
-    def __iter__(self):
+    def read_corpus(self):
         i = 0
         print('starting to process docs (iterating)')
-        shuffle(self.files)
         for filename in self.files:
             try:
                 tree = ET.parse(filename)
@@ -38,11 +37,11 @@ class DocumentsIterable(object):
 
                 i += 1
                 text = title + os.linesep + body
-                if i % 5000 == 0:
+                if i % 100 == 0:
                     print('processed documents: %s' % i)
                 words = gensim.utils.lemmatize(text, stopwords=stopwords.words('english'))
-                yield gensim.models.doc2vec.TaggedDocument(
-                    [w.decode('utf-8') for w in words], tags=[ntpath.basename(filename)])
+                self.docs.append(gensim.models.doc2vec.TaggedDocument(
+                    [w.decode('utf-8') for w in words], tags=[ntpath.basename(filename)]))
             except:
                 print('error parsing file: %s, using naive parsing' % filename)
                 with open(filename, 'r') as file_content:
@@ -51,5 +50,6 @@ class DocumentsIterable(object):
                                                                                                 '').replace(
                         "</Title>", '').replace("<Body>", '').replace("</Body>", '')
                     words = gensim.utils.lemmatize(text, stopwords=stopwords.words('english'))
-                    yield gensim.models.doc2vec.TaggedDocument(
-                        [w.decode('utf-8') for w in words], tags=[ntpath.basename(filename)])
+                    self.docs.append(gensim.models.doc2vec.TaggedDocument(
+                        [w.decode('utf-8') for w in words], tags=[ntpath.basename(filename)]))
+        return self.docs

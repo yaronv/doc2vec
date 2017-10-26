@@ -1,7 +1,4 @@
 import tensorflow as tf
-from tensorflow.contrib.tensorboard.plugins import projector
-
-from src.config import runs_path
 
 
 class TextCNN(object):
@@ -10,26 +7,30 @@ class TextCNN(object):
     Uses an embedding layer, followed by a convolutional, max-pooling and softmax layer.
     """
     def __init__(
-      self, sequence_length, num_classes, vocab_size, embeddings,
+      self, sequence_length, num_classes, vocab_size,
       embedding_size, filter_sizes, num_filters, l2_reg_lambda=0.0):
 
         # Placeholders for input, output and dropout
         self.input_x = tf.placeholder(tf.int32, [None, sequence_length], name="input_x")
         self.input_y = tf.placeholder(tf.float32, [None, num_classes], name="input_y")
         self.dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")
+        self.learning_rate = tf.placeholder(tf.float32)
 
         # Keeping track of l2 regularization loss (optional)
         l2_loss = tf.constant(0.0)
 
         # Embedding layer
+        with tf.device('/cpu:0'), tf.name_scope("embedding"):
+            self.W = tf.Variable(
+                tf.random_uniform([vocab_size, embedding_size], -1.0, 1.0),
+                name="W")
+            self.embedded_chars = tf.nn.embedding_lookup(self.W, self.input_x)
+            self.embedded_chars_expanded = tf.expand_dims(self.embedded_chars, -1)
+
         pooled_outputs = []
 
         # Create a convolution + maxpool layer for each filter size
         for i, filter_size in enumerate(filter_sizes):
-            with tf.device('/cpu:0'), tf.name_scope("embedding"):
-                wEmbeddings = tf.Variable(initial_value=embeddings, name="wEmbeddings", trainable=False, dtype=tf.float32)#shape=[vocab_size, embedding_size]       # self.embedded_chars = tf.nn.embedding_lookup(self.W, self.input_x)
-                self.embedded_words = tf.nn.embedding_lookup(wEmbeddings, self.input_x) # return shape of [None, sequence_length, embedding_size]
-                self.embedded_words_expanded = tf.expand_dims(self.embedded_words, -1) # return shape of [None, sequence_length, embedding_size, 1]
 
             with tf.name_scope("conv-maxpool-%s" % filter_size):
                 # Convolution Layer
@@ -37,7 +38,7 @@ class TextCNN(object):
                 W = tf.Variable(tf.truncated_normal(filter_shape, stddev=0.1), name="W")
                 b = tf.Variable(tf.constant(0.1, shape=[num_filters]), name="b")
                 conv = tf.nn.conv2d(
-                    self.embedded_words_expanded,
+                    self.embedded_chars_expanded,
                     W,
                     strides=[1, 1, 1, 1],
                     padding="VALID",
